@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rehan Chicken Shop – UPI QR</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--bg:#f6f6f8;--card:#fff;--tx:#1a1a1f;--mu:#6b6b76;--ac:#c62828;--bd:#e4e4ea;--ok:#1faa59;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121215;--card:#1c1c21;--tx:#f1f1f4;--mu:#9a9aa5;--bd:#2c2c33}}
+:root[data-theme="dark"]{--bg:#121215;--card:#1c1c21;--tx:#f1f1f4;--mu:#9a9aa5;--bd:#2c2c33}
+*{box-sizing:inherit}html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+.wrap{max-width:460px;margin:0 auto;padding:16px 16px 90px}
+h1{font-size:20px;margin:6px 0 2px}.sub{color:var(--mu);font-size:13px;margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:18px;margin-bottom:14px}
+label{font-size:13px;color:var(--mu);display:block;margin-bottom:6px}
+input{width:100%;font-size:18px;padding:13px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);margin-bottom:12px}
+.amt{font-size:30px;font-weight:700;text-align:center}
+button{width:100%;padding:14px;border:0;border-radius:12px;font-size:16px;font-weight:600;background:var(--ac);color:#fff;cursor:pointer}
+button.sec{background:var(--bg);color:var(--tx);border:1px solid var(--bd);margin-top:10px}
+button.ok{background:var(--ok)}
+.qrbox{background:#fff;padding:14px;border-radius:14px;width:fit-content;margin:12px auto}
+.qrbox img,.qrbox canvas{display:block}
+.center{text-align:center}.mu{color:var(--mu);font-size:13px}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--bd);display:flex;padding-bottom:env(safe-area-inset-bottom,0px)}
+nav a{flex:1;text-align:center;padding:14px 0;font-size:14px;color:var(--mu);cursor:pointer;font-weight:600}
+nav a.on{color:var(--ac)}
+.hide{display:none}
+.row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--bd)}
+.row:last-child{border:0}.row b{color:var(--ok)}
+.day{font-size:12px;color:var(--mu);margin:14px 0 2px;text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.chips span{padding:7px 14px;border:1px solid var(--bd);border-radius:20px;font-size:14px;cursor:pointer}
+footer{text-align:center;font-size:12px;color:var(--mu);margin-top:20px}footer a{color:var(--ac)}
+#success{position:fixed;inset:0;background:var(--ok);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;padding:24px;text-align:center}
+#success.hide{display:none}
+.tick{width:110px;height:110px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+.tick svg{width:60px;height:60px}
+.tick path{stroke:var(--ok);stroke-width:6;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:dr .5s .35s forwards}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}@keyframes dr{to{stroke-dashoffset:0}}
+#success h2{margin:22px 0 4px;font-size:22px}#success .big{font-size:44px;font-weight:700;margin:6px 0}
+#success button{background:#fff;color:var(--ok);margin-top:36px;max-width:300px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🐔 Rehan Chicken Shop</h1>
+  <div class="sub">UPI QR Payment</div>
+
+  <section id="home">
+    <div class="card" id="entry">
+      <label>Amount (₹)</label>
+      <input id="amount" type="number" inputmode="decimal" placeholder="0" min="1" step="0.01">
+      <div class="chips"><span data-a="50">₹50</span><span data-a="100">₹100</span><span data-a="200">₹200</span><span data-a="500">₹500</span></div>
+      <div id="err" class="mu" style="color:#d32f2f;margin-bottom:10px;display:none"></div>
+      <button id="gen">Generate QR</button>
+    </div>
+    <div class="card hide center" id="qrcard">
+      <div class="mu">Scan karke pay karein</div>
+      <div class="amt" id="qramt"></div>
+      <div class="qrbox"><div id="qr"></div></div>
+      <div class="mu" id="qrupi"></div>
+      <button class="ok" id="paid" style="margin-top:14px">✓ Payment Received</button>
+      <button class="sec" id="cancel">Cancel / Naya Amount</button>
+    </div>
+  </section>
+
+  <section id="history" class="hide">
+    <div class="card"><div class="mu">Last 7 din ka collection</div><div class="amt" id="total">₹0</div></div>
+    <div class="card" id="list"></div>
+    <button class="sec" id="clr">History Clear Karein</button>
+  </section>
+
+  <section id="settings" class="hide">
+    <div class="card">
+      <label>UPI ID</label>
+      <input id="upi" type="text" placeholder="example@upi" autocapitalize="off" autocomplete="off">
+      <label>Shop / Payee Name</label>
+      <input id="pn" type="text" placeholder="Rehan Chicken Shop">
+      <button id="save">Save</button>
+      <div class="mu center" id="msg" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <footer>Developed by <a href="https://rsdigitals.netlify.app" target="_blank" rel="noopener">RS Digital Solutions</a>. Founded by Rehan Sheikh.</footer>
+</div>
+
+<nav><a data-t="home" class="on">Home</a><a data-t="history">History</a><a data-t="settings">Settings</a></nav>
+
+<div id="success" class="hide">
+  <div class="tick"><svg viewBox="0 0 60 60"><path d="M12 31 L25 44 L48 17"/></svg></div>
+  <h2>Payment Successful</h2>
+  <div class="big" id="sa"></div>
+  <div id="st" style="opacity:.9"></div>
+  <div id="sr" style="opacity:.8;font-size:13px;margin-top:4px"></div>
+  <button id="done">Done</button>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let cfg=store.get('rcs_cfg',{upi:'',pn:'Rehan Chicken Shop'});
+let cur=0;
+const DAY=864e5;
+const inr=n=>'₹'+Number(n).toLocaleString('en-IN',{minimumFractionDigits:Number.isInteger(+n)?0:2,maximumFractionDigits:2});
+
+document.querySelectorAll('nav a').forEach(a=>a.onclick=()=>show(a.dataset.t));
+function show(t){
+  ['home','history','settings'].forEach(s=>$(s).classList.toggle('hide',s!==t));
+  document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on',a.dataset.t===t));
+  if(t==='history')renderHistory();
+  if(t==='settings'){$('upi').value=cfg.upi;$('pn').value=cfg.pn;$('msg').textContent=''}
+}
+$('save').onclick=()=>{
+  const u=$('upi').value.trim();
+  if(!/^[\w.\-]{2,}@[a-zA-Z]{2,}$/.test(u)){$('msg').textContent='Sahi UPI ID daalein (jaise name@bank)';return}
+  cfg={upi:u,pn:$('pn').value.trim()||'Rehan Chicken Shop'};
+  store.set('rcs_cfg',cfg);$('msg').textContent='✓ Save ho gaya';
+};
+document.querySelectorAll('.chips span').forEach(c=>c.onclick=()=>$('amount').value=c.dataset.a);
+$('gen').onclick=()=>{
+  const err=m=>{$('err').textContent=m;$('err').style.display=m?'block':'none'};
+  err('');
+  if(!cfg.upi){show('settings');$('msg').textContent='Pehle apni UPI ID daal kar Save karein, phir Home par QR banayein';return}
+  const a=parseFloat($('amount').value);
+  if(!(a>0)){err('Sahi amount daalein');return}
+  if(typeof QRCode==='undefined'){err('QR library load nahi hui. Internet check karke page reload karein');return}
+  cur=Math.round(a*100)/100;
+  const link='upi://pay?pa='+encodeURIComponent(cfg.upi)+'&pn='+encodeURIComponent(cfg.pn)+'&am='+cur.toFixed(2)+'&cu=INR&tn='+encodeURIComponent('Rehan Chicken Shop');
+  $('qr').innerHTML='';
+  new QRCode($('qr'),{text:link,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});
+  $('qramt').textContent=inr(cur);$('qrupi').textContent=cfg.upi;
+  $('entry').classList.add('hide');$('qrcard').classList.remove('hide');
+};
+function reset(){$('qrcard').classList.add('hide');$('entry').classList.remove('hide');$('amount').value='';$('qr').innerHTML=''}
+$('cancel').onclick=reset;
+$('paid').onclick=()=>{
+  const now=Date.now(),ref='RCS'+now.toString().slice(-9);
+  const h=store.get('rcs_hist',[]);h.unshift({a:cur,t:now,r:ref});store.set('rcs_hist',h.filter(x=>now-x.t<=30*DAY));
+  $('sa').textContent=inr(cur);
+  $('st').textContent=new Date(now).toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit'});
+  $('sr').textContent='Ref: '+ref;
+  $('success').classList.remove('hide');
+  const t=$('success').querySelector('.tick');t.style.animation='none';void t.offsetWidth;t.style.animation='';
+  try{navigator.vibrate&&navigator.vibrate(120)}catch(e){}
+};
+$('done').onclick=()=>{$('success').classList.add('hide');reset()};
+function renderHistory(){
+  const now=Date.now(),h=store.get('rcs_hist',[]).filter(x=>now-x.t<=7*DAY);
+  $('total').textContent=inr(h.reduce((s,x)=>s+x.a,0));
+  if(!h.length){$('list').innerHTML='<div class="mu center">Abhi koi payment nahi</div>';return}
+  const g={};h.forEach(x=>{const k=new Date(x.t).toDateString();(g[k]=g[k]||[]).push(x)});
+  $('list').innerHTML=Object.keys(g).map(k=>{
+    const d=new Date(k),sum=g[k].reduce((s,x)=>s+x.a,0);
+    return '<div class="day"><span>'+d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})+'</span><span>'+inr(sum)+'</span></div>'+
+    g[k].map(x=>'<div class="row"><div><div>'+x.r+'</div><div class="mu">'+new Date(x.t).toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'})+'</div></div><b>+'+inr(x.a)+'</b></div>').join('');
+  }).join('');
+}
+let ck=0;$('clr').onclick=()=>{if(!ck){ck=1;$('clr').textContent='Pakka? Dobara dabayein';setTimeout(()=>{ck=0;$('clr').textContent='History Clear Karein'},3000);return}store.set('rcs_hist',[]);ck=0;$('clr').textContent='History Clear Karein';renderHistory()};
+</script>
+</body>
+</html>
